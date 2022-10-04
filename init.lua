@@ -1,8 +1,14 @@
 require('plugins')
+
 local opt = vim.opt
+local keymap = function(mode, key, action)
+	local opts = {noremap = true, silent = true}
+	vim.keymap.set(mode, key, action, opts)
+end
+
+vim.g.mapleader = " "
 
 opt.backup = false                          -- creates a backup file
-opt.clipboard = "unnamedplus"               -- allows neovim to access the system clipboard
 opt.cmdheight = 1                           -- more space in the neovim command line for displaying messages
 opt.conceallevel = 0                        -- so that `` is visible in markdown files
 opt.fileencoding = "utf-8"                  -- the encoding written to a file
@@ -24,14 +30,15 @@ opt.number = true                           -- set numbered lines
 opt.relativenumber = true                  -- set relative numbered lines
 opt.numberwidth = 2                         -- set number column width to 2 {default 4}
 opt.wrap = false                            -- display lines as one long line
-opt.scrolloff = 8                           -- is one of my fav
+opt.scrolloff = 16                           -- is one of my fav
 opt.sidescrolloff = 8
 
 opt.shortmess:append "c"
 
 vim.cmd "set whichwrap+=<,>,[,],h,l"
 vim.cmd [[set iskeyword+=-]]
--- Mason
+
+-- Mason and lsp setup
 
 require("mason").setup()
 require("mason-lspconfig").setup({
@@ -40,11 +47,8 @@ require("mason-lspconfig").setup({
 })
 
 local on_attach = function(client, bufnr)
-  -- Enable completion triggered by <c-x><c-o>
   vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
 
-  -- Mappings.
-  -- See `:help vim.lsp.*` for documentation on any of the below functions
   local bufopts = { noremap=true, silent=true, buffer=bufnr }
   vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, bufopts)
   vim.keymap.set('n', 'gd', vim.lsp.buf.definition, bufopts)
@@ -58,7 +62,7 @@ local on_attach = function(client, bufnr)
   end, bufopts)
   vim.keymap.set('n', '<space>D', vim.lsp.buf.type_definition, bufopts)
   vim.keymap.set('n', '<space>rn', vim.lsp.buf.rename, bufopts)
-  vim.keymap.set('n', '<space>ca', vim.lsp.buf.code_action, bufopts)
+  vim.keymap.set('n', '<space>a', vim.lsp.buf.code_action, bufopts)
   vim.keymap.set('n', 'gr', vim.lsp.buf.references, bufopts)
   vim.keymap.set('n', '<space>f', function() vim.lsp.buf.format { async = true } end, bufopts)
 end
@@ -86,6 +90,7 @@ require('mini.jump').setup()
 require('mini.pairs').setup()
 require('mini.surround').setup()
 require('mini.tabline').setup()
+require('mini.trailspace').setup()
 
 -- Go setup
 require('go').setup()
@@ -97,14 +102,20 @@ vim.g.starry_italic_keywords = false
 vim.g.starry_italic_functions = false
 vim.g.starry_italic_variables = false
 vim.g.starry_contrast = true
-vim.g.starry_borders = true 
-vim.g.starry_disable_background = true  
-vim.g.starry_style_fix=true  
+vim.g.starry_borders = true
+vim.g.starry_disable_background = true
+vim.g.starry_style_fix=true
 vim.g.starry_style="earlysummer"
-vim.g.starry_darker_contrast=true  
-vim.g.starry_deep_black=false      
+vim.g.starry_darker_contrast=true
+vim.g.starry_deep_black=false
 vim.g.starry_italic_keywords=false
 vim.g.starry_italic_functions=false
-vim.g.starry_set_hl=true 
+vim.g.starry_set_hl=true
 vim.g.starry_daylight_switch=false
 vim.cmd[[colorscheme starry]]
+
+-- My keymap
+keymap('n', '<leader>e', ':Explore<CR>')
+keymap('n', '<leader>c', ':e ~/appdata/local/nvim/init.lua<CR>')
+keymap('n', '<leader>ts', ':lua MiniTrailspace.trim()<CR>')
+keymap('n', 'b[', ':bnext<CR>')
